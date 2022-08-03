@@ -16,8 +16,7 @@ void setup()
 
 void loop()
 {
-	Serial.println("CPU0 is Ready");
-	vTaskDelay(10);
+	vTaskDelay(1);
 }
 
 bool HWinit(uint8_t& error_code) {
