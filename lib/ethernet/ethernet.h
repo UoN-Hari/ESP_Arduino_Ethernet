@@ -2,9 +2,9 @@
 #define ETHERNET_ETHERNET_H
 
 #include <Arduino.h>
-#include <mutex>
 #include <ETH.h>
 #include <WiFiUdp.h>
+#include <AsyncUDP.h>
 
 #define PRIORITY_REALTIME 4u
 #define PRIORITY_HIGH     3u
@@ -17,8 +17,6 @@
 #define ETH_MDIO_PIN    18
 #define ETH_TYPE        ETH_PHY_IP101
 #define ETH_REFCLK      ETH_CLOCK_GPIO0_IN
-
-#define ETH_RX_BUF_LEN  1024
 
 class Ethernet_t {
 
@@ -33,7 +31,7 @@ private:
 public:
     void CreateThread();
     friend void Ethernet_thread(void* pvParameter);
-
+    friend class RosETH;
 
 /* Ethernet Parameters */
 private:
