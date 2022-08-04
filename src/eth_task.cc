@@ -4,7 +4,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <cstring>
 #include <codecvt>
-#include <eth_rosmsg.h>
+#include <ros_eth/eth_rosmsg.h>
 
 // char* eth_msg;
 RosETH rosmsg;
