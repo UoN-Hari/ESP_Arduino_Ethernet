@@ -8,7 +8,7 @@ RosETH::~RosETH()
 {
 }
 
-void RosETH::getMsg(geometry_msgs::TwistStamped* msg) {
+bool RosETH::getMsg(geometry_msgs::TwistStamped* msg) {
     int packet_size = Ethernet_t::getInstance().udp.parsePacket();
 
     if(packet_size) {
@@ -18,11 +18,12 @@ void RosETH::getMsg(geometry_msgs::TwistStamped* msg) {
         msg->deserialize((unsigned char*)buffer);
 
         delete buffer;
+        return true;
     }
-    
+    return false;
 }
 
-void RosETH::getMsg(geometry_msgs::Twist* msg) {
+bool RosETH::getMsg(geometry_msgs::Twist* msg) {
     int packet_size = Ethernet_t::getInstance().udp.parsePacket();
 
     if(packet_size) {
@@ -32,6 +33,7 @@ void RosETH::getMsg(geometry_msgs::Twist* msg) {
         msg->deserialize((unsigned char*)buffer);
         
         delete buffer;
+        return true;
     }
-    
+    return false;
 }

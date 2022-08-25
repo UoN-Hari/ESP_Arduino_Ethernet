@@ -5,15 +5,21 @@
 __attribute__((weak)) void Ethernet_thread(void* pvParameter);
 
 void Ethernet_t::CreateThread() {
-    xTaskCreatePinnedToCore (
-		Ethernet_thread,
-		thread_name,
-        stack_depth,
-        NULL,
-        thread_priority,
-        &thread_handler,
-        ARDUINO_RUNNING_CORE
-	);
+    if (!thread_init_status) {
+        xTaskCreatePinnedToCore (
+		    Ethernet_thread,
+		    thread_name,
+            stack_depth,
+            NULL,
+            thread_priority,
+            &thread_handler,
+            ARDUINO_RUNNING_CORE
+	    );
+        thread_init_status = true;
+    } else {
+        if(Serial)
+            Serial.println("Ethernet_Thread is already exists");
+    }
 }
 
 __attribute__((weak)) void Ethernet_thread(void* pvParameter) {
@@ -33,21 +39,82 @@ __attribute__((weak)) void Ethernet_thread(void* pvParameter) {
 #pragma region Ethernet
 
 bool Ethernet_t::Init() {
-    /* Create Thread */
     IPAddress static_ip(1, 145, 14, 19);
     IPAddress gateway(1, 145, 14, 1);
     IPAddress subnet(255, 255, 255, 0);
     
-    ethernet.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE, ETH_REFCLK);
-    ethernet.config(static_ip, gateway, subnet);
-    udp.begin(locol_port);
-
-    PrintETHInfo();
-
+    if (!ethernet.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE, ETH_REFCLK)) {
+        if (Serial) {
+            Serial.println("Initializing Ethernet failed");
+        }
+        return false;
+    } else {
+        if (Serial) {
+            Serial.println("Ethernet Initialized");
+        }
+        if(!ethernet.config(static_ip, gateway, subnet)) {
+            if (Serial) {
+                Serial.println("Configuring IP failed");
+            }
+            return false;
+        } else {
+            if (Serial) {
+                Serial.println("IP configured");
+            }
+            if(!udp.begin(locol_port)) {
+                if (Serial) {
+                    Serial.println("Beginning UDP failed");
+                }
+                return false;
+            } else {
+                if (Serial) {
+                    Serial.println("Begin UDP listening");
+                    Serial.println();
+                }
+                getETHStatus();
+            }
+        }
+    }
     return true;
 }
 
-void Ethernet_t::PrintETHInfo() {
+bool Ethernet_t::Init(IPAddress static_ip, IPAddress gateway, IPAddress subnet) {
+    if (!ethernet.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE, ETH_REFCLK)) {
+        if (Serial) {
+            Serial.println("Initializing Ethernet failed");
+        }
+        return false;
+    } else {
+        if (Serial) {
+            Serial.println("Ethernet Initialized");
+        }
+        if(!ethernet.config(static_ip, gateway, subnet)) {
+            if (Serial) {
+                Serial.println("Configuring IP failed");
+            }
+            return false;
+        } else {
+            if (Serial) {
+                Serial.println("IP configured");
+            }
+            if(!udp.begin(locol_port)) {
+                if (Serial) {
+                    Serial.println("Beginning UDP failed");
+                }
+                return false;
+            } else {
+                if (Serial) {
+                    Serial.println("Begin UDP listening");
+                    Serial.println();
+                }
+                getETHStatus();
+            }
+        }
+    }
+    return true;
+}
+
+void Ethernet_t::getETHStatus() {
     if(Serial) {
         Serial.print("ETH MAC: ");
         Serial.println(ethernet.macAddress());

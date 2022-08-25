@@ -19,48 +19,73 @@
 #define ETH_REFCLK      ETH_CLOCK_GPIO0_IN
 
 class Ethernet_t {
-
-
-/* Thread Parameters */
+/* Thread */
 private:
     TaskHandle_t thread_handler;
     const uint32_t stack_depth = 1024;
     const uint8_t thread_priority = PRIORITY_REALTIME;
     const char* thread_name = "Ethernet";
-/* Thread API */
+    bool thread_init_status = false;
 public:
+    /**
+     * @brief Create a new Thread that running in CPU1
+     * 
+     */
     void CreateThread();
+
     friend void Ethernet_thread(void* pvParameter);
     friend class RosETH;
 
-/* Ethernet Parameters */
+
+/* Ethernet */
 private:
     WiFiUDP udp;
     ETHClass ethernet;
     uint32_t locol_port = 8888;
-/* Ethernet API */
 public:
+    /**
+     * @brief This function initialize the ethernet port with an ip address
+     * 
+     * @return true is initialized ethernet successfully, 
+     * @return false is failed in initializing ethernet
+     */
     bool Init();
-    void PrintETHInfo();
+    bool Init(IPAddress static_ip, IPAddress gateway, IPAddress subnet);
+
+    /**
+     * @brief This function can get current ethernet connection status, 
+     *        require the avalibility of serial port
+     * 
+     */
+    void getETHStatus();
 
 
-/* Singuleton Parameters */
+/* Singuleton */
 private:
     static Ethernet_t instance;
-/* Constructor and Destructor */
 private:
+    /* Constructor and Destructor */
     Ethernet_t();
     ~Ethernet_t();
     Ethernet_t(const Ethernet_t&);
     Ethernet_t& operator=(const Ethernet_t&);
-/* Class Instance API */
 public:
+    /**
+     * @brief This class is a singuleton class, 
+     *        only this function can get the instance of this class
+     * 
+     * @return Ethernet_t& The instance of the class
+     */
     static Ethernet_t& getInstance();
-
-
 };
 
-/* Thread entry function */
+
+/**
+ * @brief The Thread entry function, 
+ *        have a weak implementation and can be rewrite by user
+ * 
+ * @param pvParameter the parameters of thread
+ */
 extern void Ethernet_thread(void* pvParameter);
 
 #endif
