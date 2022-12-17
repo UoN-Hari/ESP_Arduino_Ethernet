@@ -21,7 +21,6 @@ void setup () {
 	CAN::open (CAN_TX_PIN, CAN_RX_PIN, b1000k);
 
 	//Initialize Thread Tasks
-	Ethernet_t::getInstance ().CreateThread ();
 	Control::CreateThread ();
 
 	//Delete default task

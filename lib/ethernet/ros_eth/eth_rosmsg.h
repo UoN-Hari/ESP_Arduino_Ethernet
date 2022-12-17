@@ -5,24 +5,23 @@
 #include <geometry_msgs/Twist.h>
 #include <ethernet.h>
 
-class RosETH
-{
+class RosETH {
 private:
     char* buffer = nullptr;
 public:
-    RosETH(/* args */);
-    ~RosETH();
+    RosETH (/* args */);
+    ~RosETH ();
 
     /**
      * @brief Getting ros_msgs from eth port
-     * 
+     *
      * @param msg The buffer to store the deserialized ros_msg
-     * 
-     * @return false is no data receiving form eth port, 
+     *
+     * @return false is no data receiving form eth port,
      *         and true is have data received
      */
-    bool getMsg(geometry_msgs::TwistStamped* msg);
-    bool getMsg(geometry_msgs::Twist* msg);
+    bool getMsg (geometry_msgs::TwistStamped* msg);
+    bool getMsg (geometry_msgs::Twist* msg);
 };
 
 
